@@ -72,12 +72,12 @@ func Publish(ctx context.Context, channel string, msg string) error {
 // Subscribe 訂閱Redis消息
 func Subscribe(ctx context.Context, channel string) (string, error) {
 	sub := Red.Subscribe(ctx, channel)
-	fmt.Println("Subscribe 。。。。", ctx)
+	fmt.Println("Subscribe ctx : ", ctx)
 	msg, err := sub.ReceiveMessage(ctx)
 	if err != nil {
 		fmt.Println(err)
 		return "", err
 	}
-	fmt.Println("Subscribe 。。。。", msg.Payload)
+	fmt.Println("Subscribe msg.Payload : ", msg.Payload)
 	return msg.Payload, err
 }

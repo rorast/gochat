@@ -1,0 +1,30 @@
+version: '3.1'
+
+services:
+  redis:     #redis服務/其他服務（web服務/nginx服務等）
+    image: redis:7                            #redis鏡像，如果鏡像容器沒有會去自動拉取
+    container_name: im-redis                     #設置容器名稱
+    command: redis-server --appendonly yes --requirepass '123456' #持久化的支持並設置認證密碼
+    restart: always                            #跟隨docker的啟動而啟動
+    volumes:
+      - /docker-compose-redis/redis/data:/data #資料文件掛載
+    ports:
+      - 6378:6378
+  mariadb:
+    image: mariadb:10.4.7
+    restart: always
+    container_name: mariadb
+    ports:
+      # 端口映射
+      - 3306:3306
+    volumes:
+      # 容器與宿主機時間同步
+      - /etc/localtime:/etc/localtime
+      # 數據庫目錄映射
+      - ./config/mariadb:/var/lib/mysql
+      # (推荐) 如果要使用自定義的MySQL配置，則可以在主機上的目錄中創建備用配置文件，然後將該目錄位置/etc/mysql/conf.d安裝在mariadb容器內。
+      # 自已所需的配置文件可以放在自已服務器./config/data/mariadb-config里面
+      - ./config/mariadb-config:/etc/mysql/conf.d
+    environment:
+      TIME_ZONE: Asia/Taipei
+      MYSQL_ROOT_PASSWORD: 123456
