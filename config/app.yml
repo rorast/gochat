@@ -1,0 +1,19 @@
+mysql:
+  dns: root:123456@tcp(127.0.0.1:3306)/gochat?charset=utf8mb4&parseTime=True&loc=Local
+redis:
+  addr: "localhost:6378"
+  password: "123456"
+  DB: 0
+  poolSize: 30
+  minIdleConn: 30
+key:
+  salt: "%06d"
+timeout:
+  DelayHeartbeat: 3   # 延遲心跳時間 單位秒
+  HeartbeatHz: 30     # 每隔多少秒心跳時間
+  HeartbeatMaxTime: 30000  # 最大心跳時間 ， 超過此就下線
+  RedisOnlineTime: 4  # 緩存的在線用戶時長 單位 H
+
+port:
+  server: ":8080"
+  udp: 3001
