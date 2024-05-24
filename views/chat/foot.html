@@ -457,19 +457,20 @@
 
                 },
                 initwebsocket: function () {
-                    var url = "ws://" + location.host + "/user/sendMsg?userId=" + userId() + "&token=" + util.parseQuery("token");
+                    //var url = "ws://" + location.host + "/user/sendMsg?userId=" + userId() + "&token=" + util.parseQuery("token");
                     // ws://localhost:8080/user/sendMsg?userId=7&token=946468FD5CD43A07EE99245535665054
+                    var url = "ws://" + location.host + "/chat?userId=" + userId() + "&token=" + util.parseQuery("token");
                     console.log("前端initwebsocket方法::url", url)
                     this.webSocket = new WebSocket(url);
                     
                     // 消息處理
                     this.webSocket.onmessage = function (evt) {
-                        // console.log("前端initwebsocket方法::onmessage", evt.data)
+                        console.log("前端initwebsocket方法::onmessage", evt.data)
                         if (evt.data.indexOf("}") > -1) {
-                            // console.log("前端initwebsocket方法::recv json <==" + JSON.parse(evt.data))
+                            console.log("前端initwebsocket方法::recv json <==" + JSON.parse(evt.data))
                             this.onmessage(JSON.parse(evt.data));
                         } else {
-                            // console.log("前端initwebsocket方法::recv<==" + evt.data)
+                            console.log("前端initwebsocket方法::recv<==" + evt.data)
                         }
                     }.bind(this)
                     // 關閉回調
@@ -502,7 +503,7 @@
                 loadcommunitys: function () {
                     var that = this;
                     post("contact/loadcommunity", { ownerId: userId() }, function (res) {
-                        that.communitys = res.Rows || [];
+                        that.communitys = res.rows || [];
                     })
                 },
                 addfriend: function () {

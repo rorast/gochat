@@ -209,6 +209,11 @@ var upGrader = websocket.Upgrader{
 	},
 }
 
+// 聊天路由執行方法
+func SendUserMsg(c *gin.Context) {
+	models.Chat(c.Writer, c.Request)
+}
+
 func SendMsg(c *gin.Context) {
 	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
@@ -224,8 +229,19 @@ func SendMsg(c *gin.Context) {
 	MsgHandler(c, ws)
 }
 
+func RedisMsg(c *gin.Context) {
+	userIdA, _ := strconv.Atoi(c.PostForm("userIdA"))
+	userIdB, _ := strconv.Atoi(c.PostForm("userIdB"))
+	start, _ := strconv.Atoi(c.PostForm("start"))
+	end, _ := strconv.Atoi(c.PostForm("end"))
+	isRev, _ := strconv.ParseBool(c.PostForm("isRev"))
+	res := models.RedisMsg(int64(userIdA), int64(userIdB), int64(start), int64(end), isRev)
+	tools.RespOKList(c.Writer, "ok", res)
+}
+
 func MsgHandler(c *gin.Context, ws *websocket.Conn) {
 	for {
+		// 訂閱 redis ，特別注意-- 若是redis設置連不上，會導致錯誤回圈產生
 		msg, err := models.Subscribe(c, models.PublishKey)
 		if err != nil {
 			fmt.Println(" MsgHandler 发送失败", err)
@@ -244,7 +260,7 @@ func MsgHandler(c *gin.Context, ws *websocket.Conn) {
 // 搜尋好友的邏輯處理
 func SearchFriends(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Request.FormValue("userId"))
-	fmt.Println(" ID =======> ", id)
+	fmt.Println("<func SearchFriends> ID =======> ", id)
 	users := models.SearchFriend(uint(id))
 	// c.JSON(200, gin.H{
 	// 	"code":    0, //  0成功   -1失败

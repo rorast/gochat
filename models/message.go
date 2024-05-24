@@ -97,7 +97,7 @@ func Chat(writer http.ResponseWriter, request *http.Request) {
 	//SetUserOnlineInfo("online_"+Id, []byte(node.Addr), time.Duration(viper.GetInt("timeout.RedisOnlineTime"))*time.Hour)
 
 	sendMsg(userId, []byte("歡迎進入真人聊天系統"))
-
+	fmt.Println("sendMsg(userId, []byte(\"歡迎進入真人聊天系統\"))")
 }
 
 // 5.完成發送邏輯
@@ -251,7 +251,7 @@ func sendMsg(userId int64, msg []byte) {
 	jsonMsg.CreateTime = uint64(time.Now().Unix())
 	r, err := Red.Get(ctx, "online_"+userIdStr).Result()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("redis error:::", err)
 	}
 	if r != "" {
 		if ok {
@@ -271,11 +271,57 @@ func sendMsg(userId int64, msg []byte) {
 	}
 	score := float64(cap(res)) + 1
 	ress, e := Red.ZAdd(ctx, key, &redis.Z{score, msg}).Result() //jsonMsg
-	//res, e := utils.Red.Do(ctx, "zadd", key, 1, jsonMsg).Result() //备用 后续拓展 记录完整msg
+	//res, e := utils.Red.Do(ctx, "zadd", key, 1, jsonMsg).Result() // 備用 後續擴展 記錄完整msg
 	if e != nil {
 		fmt.Println(e)
 	}
-	fmt.Println(ress)
+	fmt.Println("sendMsg -> Red.ZAdd : ", ress)
+}
+
+// 需更改此方法才能完整的 msg 轉 byte[]
+func (msg Message) MarshalBinary() ([]byte, error) {
+	return json.Marshal(msg)
+}
+
+// 取得湲存里面的消息
+func RedisMsg(userIdA int64, userIdB int64, start int64, end int64, isRev bool) []string {
+	rwLocker.RLock()
+	//node, ok := clientMap[userIdA]
+	rwLocker.RUnlock()
+	//jsonMsg := Message{}
+	//json.Unmarshal(msg, &jsonMsg)
+	ctx := context.Background()
+	userIdStr := strconv.Itoa(int(userIdA))
+	targetIdStr := strconv.Itoa(int(userIdB))
+	var key string
+	if userIdA > userIdB {
+		key = "msg_" + targetIdStr + "_" + userIdStr
+	} else {
+		key = "msg_" + userIdStr + "_" + targetIdStr
+	}
+	//key = "msg_" + userIdStr + "_" + targetIdStr
+	//rels, err := utils.Red.ZRevRange(ctx, key, 0, 10).Result()  //根据score倒叙
+
+	var rels []string
+	var err error
+	if isRev {
+		// 取得 init.go 中的 Red 實例
+		rels, err = Red.ZRange(ctx, key, start, end).Result()
+	} else {
+		// 取得 init.go 中的 Red 實例
+		rels, err = Red.ZRevRange(ctx, key, start, end).Result()
+	}
+	if err != nil {
+		fmt.Println(err) // 沒有找到
+	}
+	// 發送推送消息
+	/**
+	// 後台通過 websoket 推送消息
+	for _, val := range rels {
+		fmt.Println("sendMsg >>> userID: ", userIdA, "  msg:", val)
+		node.DataQueue <- []byte(val)
+	}**/
+	return rels
 }
 
 // 更新用户心跳
