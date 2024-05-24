@@ -12,7 +12,7 @@ timeout:
   DelayHeartbeat: 3   # 延遲心跳時間 單位秒
   HeartbeatHz: 30     # 每隔多少秒心跳時間
   HeartbeatMaxTime: 30000  # 最大心跳時間 ， 超過此就下線
-  RedisOnlineTime: 4  # 緩存的在線用戶時長 單位 H
+  RedisOnlineTime: 4  # 緩存的在線用戶時長 單位 H H
 
 port:
   server: ":8080"
