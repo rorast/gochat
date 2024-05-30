@@ -236,6 +236,7 @@ func RedisMsg(c *gin.Context) {
 	end, _ := strconv.Atoi(c.PostForm("end"))
 	isRev, _ := strconv.ParseBool(c.PostForm("isRev"))
 	res := models.RedisMsg(int64(userIdA), int64(userIdB), int64(start), int64(end), isRev)
+	fmt.Println("redis中的聊天記錄 : ", res)
 	tools.RespOKList(c.Writer, "ok", res)
 }
 

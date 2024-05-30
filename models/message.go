@@ -93,11 +93,10 @@ func Chat(writer http.ResponseWriter, request *http.Request) {
 	go sendProc(node)
 	//6.完成接收邏輯
 	go recvProc(node)
-	//7.加入在線用戶到緩存
-	//SetUserOnlineInfo("online_"+Id, []byte(node.Addr), time.Duration(viper.GetInt("timeout.RedisOnlineTime"))*time.Hour)
+	//7.加入在線用戶到緩存 (此部份關係到 sendProc(node), 因取不到緩存，所以就沒有目標用戶進行發送)
+	SetUserOnlineInfo("online_"+Id, []byte(node.Addr), time.Duration(viper.GetInt("timeout.RedisOnlineTime"))*time.Hour)
 
-	sendMsg(userId, []byte("歡迎進入真人聊天系統"))
-	fmt.Println("sendMsg(userId, []byte(\"歡迎進入真人聊天系統\"))")
+	//sendMsg(userId, []byte("Welcome to live MSN"))
 }
 
 // 5.完成發送邏輯

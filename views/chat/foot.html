@@ -140,9 +140,9 @@
             },
             created: function () {
                 this.loadfriends();
-                this.loadcommunitys();
+                // this.loadcommunitys();
                 this.loaddoutures();
-                setInterval(this.heartbeat, 10 * 1000);
+                setInterval(this.heartbeat, 10 * 1000); // 每秒發出心跳 websocket
                 var user = userInfo()
                 // 初始化 websocket
                 this.initwebsocket()
@@ -180,10 +180,7 @@
                             suporttype = types[i];
                         }
                     }
-                    if (!suporttype) {
-                        mui.toast("編碼不支持")
-                        return;
-                    }
+
 
                     this.duration = new Date().getTime();
                     //video 攝像頭   ，audio 音頻
@@ -314,7 +311,7 @@
                         this.setTimeFlag()
                         //{id:1,userid:2,dstid:3,cmd:10,media:1,content:"hello"}
                         var msg = this.createmsgcontext();
-                        msg.Media = 1;
+                        msg.Media = 1; // 1表文本，在這先寫死，之後再自行改成活動的
                         msg.Content = txt;
                         if (msg.Type == 1) {
                             this.showmsg(userInfo(), msg);
@@ -357,6 +354,7 @@
                 closePanel() {
                     this.panelstat = 'kbord';
                 },
+                // 在 concat.html(聯絡人頁面)，進行 singlemsg 點擊後進入該好友一對一聊天頁面
                 singlemsg: function (user) {
                     this.start = 0;
                     this.end = 9;
@@ -364,9 +362,10 @@
                         // 首次讀取某個用戶的消息記錄
                         if (this.isReadRedisMsg.filter(item => item === user.ID).length <= 0) {
                             post("user/redisMsg", { userIdA: userId(), userIdB: user.ID, start: this.start, end: this.end, isRev: false }, function (res) {
+                                console.log("取得redis中的聊天記錄 : ", res.total)
                                 // 循環讀取的消息記錄 並顯示
-                                for (var i in res.Total) {
-                                    this.showmsg(user, JSON.parse(res.Total[i]), false, true)
+                                for (var i in res.total) {
+                                    this.showmsg(user, JSON.parse(res.total[i]), false, true)
                                 }
                             }.bind(this))
                             this.isReadRedisMsg.push(user.ID)
@@ -398,8 +397,8 @@
                                     this.end = this.end + 2;
                                     post("user/redisMsg", { userIdA: userId(), userIdB: user.ID, start: this.start, end: this.end, isRev: false }, function (res) {
                                         // 循環讀取的消息記錄 並顯示
-                                        for (var i in res.Total) {
-                                            this.showmsg(user, JSON.parse(res.Total[i]), true)
+                                        for (var i in res.total) {
+                                            this.showmsg(user, JSON.parse(res.total[i]), true)
                                         }
                                         setTimeout(() => {
                                             this.isLoadMore = false;
@@ -460,17 +459,17 @@
                     //var url = "ws://" + location.host + "/user/sendMsg?userId=" + userId() + "&token=" + util.parseQuery("token");
                     // ws://localhost:8080/user/sendMsg?userId=7&token=946468FD5CD43A07EE99245535665054
                     var url = "ws://" + location.host + "/chat?userId=" + userId() + "&token=" + util.parseQuery("token");
-                    console.log("前端initwebsocket方法::url", url)
+                    // console.log("前端initwebsocket方法::url", url)
                     this.webSocket = new WebSocket(url);
-                    
+
                     // 消息處理
                     this.webSocket.onmessage = function (evt) {
-                        console.log("前端initwebsocket方法::onmessage", evt.data)
+                        console.log("onmessage", evt.data)
                         if (evt.data.indexOf("}") > -1) {
-                            console.log("前端initwebsocket方法::recv json <==" + JSON.parse(evt.data))
+                            console.log("recv json <==" + JSON.parse(evt.data))
                             this.onmessage(JSON.parse(evt.data));
                         } else {
-                            console.log("前端initwebsocket方法::recv<==" + evt.data)
+                            console.log("recv<==" + evt.data)
                         }
                     }.bind(this)
                     // 關閉回調
@@ -484,6 +483,7 @@
                     /*{
                         this.webSocket.send()
                     }*/
+
                 },
                 sendmsg: function () {
 
@@ -494,7 +494,7 @@
                         that.friends = res.rows || [];
                         var usermap = this.usermap;
                         for (var i in res.rows) {        // Rows 改成小寫 rows 才有值，再查看看
-                            var k = "" + res.rows[i].id  // Rows 改成小寫 rows 才有值，再查看看  ID 改 id
+                            var k = "" + res.rows[i].ID; // Rows 改成小寫 rows 才有值，再查看看  ID 改 id
                             usermap[k] = res.rows[i];    // Rows 改成小寫 rows 才有值，再查看看
                         }
                         this.usermap = usermap;
