@@ -30,6 +30,7 @@
                             <img class="avatar left" :src="otherAvatar ||'/asset/images/avatar0.png'" />
                         </div>
                         <span></span>
+                        <!-- 顯示對話內容的判斷 -->
                         <div class="content">
                             <div v-if="item.msg.Media==1" v-text="item.msg.Content"></div>
                             <img class="pic" v-if="item.msg.Media==4" :src="item.msg.url" />

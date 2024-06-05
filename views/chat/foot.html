@@ -141,7 +141,7 @@
             created: function () {
                 this.loadfriends();
                 // this.loadcommunitys();
-                this.loaddoutures();
+                this.loaddoutures();  // 建立表情包資料
                 setInterval(this.heartbeat, 10 * 1000); // 每秒發出心跳 websocket
                 var user = userInfo()
                 // 初始化 websocket
@@ -235,6 +235,7 @@
                 createmsgcontext: function () {
                     return JSON.parse(JSON.stringify(this.msgcontext))
                 },
+                // 發送表情包的處理
                 loaddoutures: function () {
                     var res = [];
                     var config = this.doutu.config;
@@ -320,12 +321,13 @@
                         this.webSocket.send(JSON.stringify(msg))
                     }
                 },
+                // 發送表情符號圖譬的處理
                 sendpicmsg: function (picurl) {
                     if (this.isDisable) {
                         this.setTimeFlag()
                         //{id:1,userid:2,dstid:3,cmd:10,media:4,url:"http://www.baidu.com/a/log,jpg"}
                         var msg = this.createmsgcontext();
-                        msg.Media = 4;
+                        msg.Media = 4;  // 這個 Media 大小寫有差，不正確的話，在前端查值時，要調整
                         msg.url = picurl;
                         if (msg.Type == 1) {
                             this.showmsg(userInfo(), msg);
