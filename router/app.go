@@ -40,8 +40,8 @@ func Router() *gin.Engine {
 
 	// 發送消息
 	r.GET("/user/sendMsg", service.SendMsg)
-	//發送消息
 	r.GET("/user/sendUserMsg", service.SendUserMsg)
+	r.POST("/attach/upload", service.Upload)
 
 	r.POST("/user/redisMsg", service.RedisMsg)
 

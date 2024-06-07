@@ -1,28 +1,28 @@
 {{define "/chat/foot.shtml"}}
 <script>
-
+    // 上傳圖片
     function upload(dom) {
         uploadfile("attach/upload", dom, function (res) {
-            if (res.Code == 0) {
-                app.sendpicmsg(res.Data)
+            if (res.code == 0) {          // Code 的大小寫要研究一下，為何之前是大寫，現在是小寫
+                app.sendpicmsg(res.data)  // Data 也是同上
             }
         })
     }
     // 上傳圖片 創建群
     function uploadthis(dom) {
         uploadfile("attach/upload", dom, function (res) {
-            if (res.Code == 0) {
-                app.com.icon = res.Data;
-                console.log(res.Data);
+            if (res.code == 0) {
+                app.com.icon = res.data;
+                console.log(res.data);
             }
         })
     }
     // 維護用戶頭像
     function uploadUserInfo(dom) {
         uploadfile("attach/upload", dom, function (res) {
-            if (res.Code == 0) {
-                app.info.icon = res.Data;
-                console.log(res.Data);
+            if (res.code == 0) {
+                app.info.icon = res.data;
+                console.log(res.data);
             }
         })
     }
@@ -165,7 +165,9 @@
                     document.getElementById('audio4play').src = url;
                     document.getElementById('audio4play').play();
                 },
+                // 按住錄語音
                 startrecorder: function () {
+                    console.log("按住錄語音")
                     let audioTarget = document.getElementById('audio');
                     var types = ["video/webm",
                         "audio/webm",
@@ -194,7 +196,7 @@
                                 console.log("ondataavailable");
                                 uploadblob("attach/upload", event.data, ".mp3", res => {
                                     var duration = Math.ceil((new Date().getTime() - this.duration) / 1000);
-                                    this.sendaudiomsg(res.Data, duration);
+                                    this.sendaudiomsg(res.data, duration);  // 注意 Data 的大小寫
                                 })
                                 stream.getTracks().forEach(function (track) {
                                     track.stop();
